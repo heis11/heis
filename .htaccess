@@ -1,0 +1,5 @@
+# Do not serve setup files over the web.
+<FilesMatch "\.(sql|md)$">
+    Require all denied
+</FilesMatch>
+Options -Indexes
