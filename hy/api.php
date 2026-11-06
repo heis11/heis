@@ -1,8 +1,12 @@
 <?php
 // Small proxy so the TMDB key stays on the server and never reaches the browser.
 // Also serves the movies that the administrator published (catalog actions).
+// Never let PHP warnings/notices leak into the JSON reply (they would break the page).
+ini_set('display_errors', '0');
+ob_start();
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/includes/functions.php';
+ob_clean();
 header('Content-Type: application/json; charset=utf-8');
 header('X-Content-Type-Options: nosniff');
 
@@ -140,6 +144,9 @@ switch ($action) {
             $out['sources'] = array_map('source_playback', array_values(array_filter(movie_sources_of($id), fn($s) => (int)$s['is_active'] === 1)));
             echo json_encode($out);
         });
+        break;
+    case '':
+        echo json_encode(['status' => 'ok', 'tmdb_key' => TMDB_API_KEY !== '']);
         break;
     default:
         fail('Unknown action.');
